@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Biosmile Cirugías">
+<meta name="theme-color" content="#0a3d2e">
+<title>Biosmile — Alta Post-Quirúrgica</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green-dark: #0a3d2e;
+    --green-mid: #1a6b52;
+    --green-light: #e8f5f0;
+    --green-pale: #f2faf7;
+    --accent: #2db584;
+    --text: #111a16;
+    --text-2: #5a7068;
+    --border: rgba(10,61,46,0.12);
+    --radius: 14px;
+    --radius-sm: 9px;
+  }
+
+  html, body {
+    min-height: 100vh;
+    background: var(--green-pale);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 3rem;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    width: 100%;
+    background: var(--green-dark);
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+
+  .topbar-icon {
+    width: 38px; height: 38px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .topbar-icon svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+  .topbar-text { flex: 1; }
+  .topbar-text h1 { font-family: 'DM Serif Display', serif; font-size: 17px; color: #fff; font-weight: 400; }
+  .topbar-text p { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 1px; letter-spacing: 0.04em; text-transform: uppercase; }
+
+  .topbar-badge {
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.7);
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  /* MAIN */
+  .main { width: 100%; max-width: 480px; padding: 0 1rem; }
+
+  /* TOAST */
+  .toast {
+    display: none;
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    align-items: center;
+    gap: 8px;
+    animation: slideIn 0.2s ease;
+  }
+  .toast.ok { display: flex; background: #d4eddf; color: #0a4a26; }
+  .toast.err { display: flex; background: #fde8e8; color: #7a1a1a; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* CARD */
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-2);
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .field { margin-bottom: 1rem; }
+  .field:last-child { margin-bottom: 0; }
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-2);
+    margin-bottom: 6px;
+  }
+
+  input[type="text"],
+  input[type="tel"],
+  input[type="date"],
+  select {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(45,181,132,0.12); }
+  input::placeholder { color: #b0bdb8; }
+
+  /* SUCURSAL TOGGLE */
+  .suc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .suc-btn {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 13px 10px;
+    text-align: center;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    background: #fff;
+    color: var(--text-2);
+    transition: all 0.15s;
+  }
+  .suc-btn:active { transform: scale(0.97); }
+  .suc-btn.active {
+    background: var(--green-dark);
+    color: #fff;
+    border-color: var(--green-dark);
+  }
+  .suc-btn span { display: block; font-size: 10px; font-weight: 400; opacity: 0.7; margin-top: 2px; }
+
+  /* DATES DISPLAY */
+  .dates-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .date-chip {
+    background: var(--green-light);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .date-chip .dc-label { font-size: 10px; font-weight: 700; color: var(--green-mid); letter-spacing: 0.06em; text-transform: uppercase; }
+  .date-chip .dc-val { font-size: 15px; font-weight: 600; color: var(--green-dark); margin-top: 3px; }
+
+  /* SELECT WRAPPER */
+  .select-wrap { position: relative; }
+  .select-wrap::after {
+    content: '';
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0; height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid var(--text-2);
+    pointer-events: none;
+  }
+
+  /* SUBMIT */
+  .btn-guardar {
+    width: 100%;
+    padding: 15px;
+    background: var(--green-dark);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background 0.15s, transform 0.1s;
+    letter-spacing: 0.01em;
+  }
+  .btn-guardar:active:not(:disabled) { transform: scale(0.98); }
+  .btn-guardar:disabled { background: #9ab5ad; cursor: not-allowed; }
+  .btn-guardar svg { width: 20px; height: 20px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .btn-guardar.loading { background: #1a6b52; }
+
+  /* COUNTER */
+  .counter {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-2);
+    margin-top: 1rem;
+  }
+  .counter strong { color: var(--green-dark); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-icon">
+    <svg viewBox="0 0 24 24"><path d="M12 2C9 2 7 4 7 7c0 2 1 3.5 2 4.5L8 20a1 1 0 001 1h6a1 1 0 001-1l-1-8.5C16 10.5 17 9 17 7c0-3-2-5-5-5z"/></svg>
+  </div>
+  <div class="topbar-text">
+    <h1>Alta Post-Quirúrgica</h1>
+    <p>Biosmile · Seguimiento de cirugías</p>
+  </div>
+  <div class="topbar-badge" id="topBadge">HOY</div>
+</div>
+
+<div class="main">
+
+  <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+  <!-- SUCURSAL -->
+  <div class="card">
+    <div class="card-title">Sucursal</div>
+    <div class="field">
+      <div class="suc-grid">
+        <button class="suc-btn active" id="btnRODEO" onclick="setSucursal('RODEO')" type="button">
+          RODEO
+          <span>Sucursal principal</span>
+        </button>
+        <button class="suc-btn" id="btnNOVA" onclick="setSucursal('NOVA')" type="button">
+          NOVA
+          <span>Sucursal nueva</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FECHA Y SEGUIMIENTO -->
+  <div class="card">
+    <div class="card-title">Fecha de cirugía</div>
+    <div class="field">
+      <label for="fFecha">Fecha</label>
+      <input type="date" id="fFecha" oninput="calcDates()" />
+    </div>
+    <div class="field">
+      <label>Contactos automáticos</label>
+      <div class="dates-row">
+        <div class="date-chip">
+          <div class="dc-label">D+1</div>
+          <div class="dc-val" id="dPlus1">—</div>
+        </div>
+        <div class="date-chip">
+          <div class="dc-label">D+3</div>
+          <div class="dc-val" id="dPlus3">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATOS DEL PACIENTE -->
+  <div class="card">
+    <div class="card-title">Datos del paciente</div>
+    <div class="field">
+      <label for="fPaciente">Nombre y apellido</label>
+      <input type="text" id="fPaciente" placeholder="Ej: González María" autocomplete="off" />
+    </div>
+    <div class="field">
+      <label for="fTelefono">Teléfono</label>
+      <input type="tel" id="fTelefono" placeholder="Ej: 2614123456" inputmode="numeric" autocomplete="off" />
+    </div>
+    <div class="field">
+      <label for="fTratamiento">Tratamiento</label>
+      <div class="select-wrap">
+        <select id="fTratamiento">
+          <option value="">Seleccioná el tratamiento…</option>
+          <option>Exodoncia compleja</option>
+          <option>Implante</option>
+          <option>Cirugía de tejidos blandos</option>
+          <option>Otro</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-guardar" id="btnGuardar" onclick="guardar()" type="button">
+    <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+    Guardar paciente
+  </button>
+
+  <div class="counter" id="counter"></div>
+
+</div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwaAGWWrDGLla0qVyrGQRq5ddmTsQVgSZS2TCCqi-T8Lw37ci-B1I0L_dDl4viSHshk/exec';
+
+let sucursal = 'RODEO';
+let guardados = parseInt(localStorage.getItem('bs_guardados') || '0');
+
+function setSucursal(s) {
+  sucursal = s;
+  document.getElementById('btnRODEO').className = 'suc-btn' + (s === 'RODEO' ? ' active' : '');
+  document.getElementById('btnNOVA').className = 'suc-btn' + (s === 'NOVA' ? ' active' : '');
+}
+
+function calcDates() {
+  const val = document.getElementById('fFecha').value;
+  if (!val) {
+    document.getElementById('dPlus1').textContent = '—';
+    document.getElementById('dPlus3').textContent = '—';
+    return;
+  }
+  const base = new Date(val + 'T00:00:00');
+  const fmt = d => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  const d1 = new Date(base); d1.setDate(base.getDate() + 1);
+  const d3 = new Date(base); d3.setDate(base.getDate() + 3);
+  document.getElementById('dPlus1').textContent = fmt(d1);
+  document.getElementById('dPlus3').textContent = fmt(d3);
+}
+
+function fmtDate(val) {
+  if (!val) return '';
+  const [y, m, d] = val.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function showToast(tipo, msg) {
+  const t = document.getElementById('toast');
+  t.className = 'toast ' + tipo;
+  t.textContent = msg;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.className = 'toast'; }, 4000);
+}
+
+function updateCounter() {
+  const el = document.getElementById('counter');
+  if (guardados > 0) el.innerHTML = `<strong>${guardados}</strong> paciente${guardados !== 1 ? 's' : ''} cargado${guardados !== 1 ? 's' : ''} en esta sesión`;
+  else el.textContent = '';
+}
+
+async function guardar() {
+  const fecha = document.getElementById('fFecha').value;
+  const paciente = document.getElementById('fPaciente').value.trim();
+  const telefono = document.getElementById('fTelefono').value.trim();
+  const tratamiento = document.getElementById('fTratamiento').value;
+
+  if (!fecha || !paciente || !telefono || !tratamiento) {
+    showToast('err', '⚠ Completá todos los campos antes de guardar');
+    return;
+  }
+
+  const base = new Date(fecha + 'T00:00:00');
+  const fmt = d => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  const d1 = new Date(base); d1.setDate(base.getDate() + 1);
+  const d3 = new Date(base); d3.setDate(base.getDate() + 3);
+
+  const payload = {
+    sucursal,
+    fechaCirugia: fmtDate(fecha),
+    paciente,
+    telefono,
+    tratamiento,
+    profesional: '',
+    dPlus1: fmt(d1),
+    dPlus3: fmt(d3)
+  };
+
+  const btn = document.getElementById('btnGuardar');
+  btn.disabled = true;
+  btn.className = 'btn-guardar loading';
+  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Guardando...';
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify(payload)
+    });
+
+    guardados++;
+    localStorage.setItem('bs_guardados', guardados);
+    updateCounter();
+    showToast('ok', `✓ ${paciente} cargado correctamente en la planilla`);
+
+    // Reset campos pero mantiene fecha y sucursal
+    document.getElementById('fPaciente').value = '';
+    document.getElementById('fTelefono').value = '';
+    document.getElementById('fTratamiento').value = '';
+    document.getElementById('fPaciente').focus();
+
+  } catch(err) {
+    showToast('err', '✗ Error al conectar. Verificá tu conexión a internet.');
+  } finally {
+    btn.disabled = false;
+    btn.className = 'btn-guardar';
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg> Guardar paciente';
+  }
+}
+
+// Init
+window.addEventListener('load', () => {
+  const today = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('fFecha').value = `${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
+  calcDates();
+  document.getElementById('topBadge').textContent = today.toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric', month: 'short' }).toUpperCase();
+  updateCounter();
+});
+</script>
+</body>
+</html>
